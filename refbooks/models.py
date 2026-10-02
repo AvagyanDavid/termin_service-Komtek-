@@ -12,6 +12,20 @@ class RefBook(models.Model):
     def __str__(self):
         return f"{self.code} - {self.name}"
 
+    def get_current_version(self, on_date=None):
+        if on_date is None:
+            on_date = timezone.localdate()
+
+        return (
+            self.versions
+            .filter(
+                start_date__isnull=False,
+                start_date__lte=on_date
+            )
+            .order_by("-start_date")
+            .first()
+        )
+
 class RefBookVersion(models.Model):
     refbook = models.ForeignKey(
         RefBook,

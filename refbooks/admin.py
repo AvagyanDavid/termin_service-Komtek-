@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.utils import timezone
 
 from .models import RefBook, RefBookVersion, RefBookElement
 
@@ -32,29 +31,13 @@ class RefBookAdmin(admin.ModelAdmin):
 
     @admin.display(description="Текущая версия")
     def current_version(self, obj):
-        version = (
-            obj.versions
-            .filter(
-                start_date__isnull=False,
-                start_date__lte=timezone.localdate(),
-            )
-            .order_by("-start_date")
-            .first()
-        )
+        version = obj.get_current_version()
 
         return version.version if version else "-"
 
     @admin.display(description="Дата начала действия версии")
     def current_version_start_date(self, obj):
-        version = (
-            obj.versions
-            .filter(
-                start_date__isnull=False,
-                start_date__lte=timezone.localdate(),
-            )
-            .order_by("-start_date")
-            .first()
-        )
+        version = obj.get_current_version()
 
         return version.start_date if version else "-"
 

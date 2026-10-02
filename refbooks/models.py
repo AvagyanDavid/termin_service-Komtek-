@@ -1,6 +1,6 @@
 from django.db import models
 
-class Refbooks(models.Model):
+class RefBook(models.Model):
     code = models.CharField(max_length=100, unique=True)
     name = models.CharField(max_length=300, )
     description = models.TextField(blank=True, )
@@ -14,7 +14,7 @@ class Refbooks(models.Model):
 
 class RefBookVersion(models.Model):
     refbook = models.ForeignKey(
-        Refbooks,
+        RefBook,
         on_delete=models.CASCADE,
         related_name="versions",
     )

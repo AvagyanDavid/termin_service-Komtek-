@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class RefBook(models.Model):
     code = models.CharField(max_length=100, unique=True)

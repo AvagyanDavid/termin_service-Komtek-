@@ -1,12 +1,14 @@
-from datetime import date
-
 from django.utils.dateparse import parse_date
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import RefBook
-from .serializers import RefBookSerializer
+from .serializers import (
+    RefBookSerializer,
+    RefBookElementSerializer,
+)
+
 
 class RefBookListAPIView(APIView):
     def get(self, request):
@@ -45,5 +47,55 @@ class RefBookListAPIView(APIView):
         return Response(
             {
                 "refbooks": serializer.data,
+            }
+        )
+
+class RefBookElementsAPIView(APIView):
+    def get(self, request, pk):
+        try:
+            refbook = RefBook.objects.get(pk=pk)
+        except RefBook.DoesNotExist:
+            return Response(
+                {
+                    "detail":"Справочник не найден."
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        version_name = request.query_params.get("version")
+
+        if version_name:
+            version = refbook.versions.filter(
+                version=version_name,
+            ).first()
+
+            if version is None:
+                return Response(
+                    {
+                        "detail": "Указанная версия справочника не найдена."
+                    },
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        else:
+            version = refbook.get_current_version()
+
+            if version is None:
+                return Response(
+                    {
+                        "detail": "Для справочника нет актуальной версии"
+                    },
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+        elements = version.elements.all()
+
+        serializer = RefBookElementSerializer(
+            elements,
+            many=True,
+        )
+
+        return Response (
+            {
+                "detail": serializer.data,
             }
         )

@@ -1,7 +1,9 @@
 from django.urls import path
 
-from .views import RefBookListAPIView
-
+from .views import (
+    RefBookElementsAPIView,
+    RefBookListAPIView,
+)
 
 urlpatterns = [
     path(
@@ -9,4 +11,9 @@ urlpatterns = [
         RefBookListAPIView.as_view(),
         name="refbook-list",
     ),
+    path(
+        "refbooks/<int:pk>/elements/",
+        RefBookElementsAPIView.as_view(),
+        name="refbook-elements",
+    )
 ]
